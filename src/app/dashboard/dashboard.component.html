@@ -1,18 +1,14 @@
 <div class="container-fluid mb-2 mt-2">
   <div class="row display-4">
-    <div class="col text-left" (click)="vacant = !vacant">
-      1:15 PM
-    </div>
-    <div class="col text-right">
-      Sun 25<sup>th</sup> Aug, 2019
-    </div>
+    <div class="col text-left" (click)="vacant = !vacant">{{time}}</div>
+    <div class="col text-right">{{date}}</div>
   </div>
 </div>
 <div class="jumbotron jumbotron-fluid d-flex align-items-center text-center status-bar" [ngClass]="vacant ? 'bg-success' : 'bg-danger'">
   <div class="container">
     <div class="row">
       <div class="col">
-        <span class="display-1"><strong>{{vacant ? 'Vacant' : 'Occupied'}}</strong></span>
+        <span class="display-1 font-weight-bold">{{vacant ? 'Vacant' : 'Occupied'}}</span>
       </div>
     </div>
     <div class="row" *ngIf="!vacant">
