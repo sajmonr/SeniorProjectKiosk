@@ -4,37 +4,52 @@
     <div class="col text-right">{{date}}</div>
   </div>
 </div>
-<div class="jumbotron jumbotron-fluid d-flex align-items-center text-center status-bar" [ngClass]="vacant ? 'bg-success' : 'bg-danger'">
+<div class="jumbotron jumbotron-fluid d-flex align-items-center text-center status-bar mb-1" [ngClass]="vacant ? 'bg-success' : 'bg-danger'">
   <div class="container">
     <div class="row">
       <div class="col">
-        <span class="display-1 font-weight-bold">{{vacant ? 'Vacant' : 'Occupied'}}</span>
+        <span class="display-1 font-weight-400">{{vacant ? 'Available' : 'Unavailable'}}</span>
       </div>
     </div>
     <div class="row" *ngIf="!vacant">
       <div class="col">
-        <span class="display-4">(Available in 54 minutes)</span>
+        <span class="display-4">Meeting by Adam Simonicek</span>
+      </div>
+    </div>
+    <div class="row" *ngIf="!vacant">
+      <div class="col">
+        <span class="display-4">(4:00 PM - 5:00 PM)</span>
       </div>
     </div>
   </div>
 </div>
-<div class="container mt-3">
+<div class="container mt-2">
+<!--  <div class="row">-->
+<!--    <div class="col-md-4">-->
+<!--      <span class="display-3">Upcoming meetings</span>-->
+<!--    </div>-->
+<!--    <div class="col">-->
+<!--      <div class="container mb-2 border-bottom" *ngFor="let meeting of upcomingMeetings">-->
+<!--        <div class="row">-->
+<!--          <div class="col-md-12">-->
+<!--            <span class="display-4">{{meeting.title}}</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--          <div class="col">-->
+<!--            {{meeting.startTime}} - {{meeting.endTime}}-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
   <div class="row">
-    <div class="col-md-3">
-      <span class="display-3">Upcoming meetings</span>
-    </div>
-    <div class="col">
-      <div class="container mb-2 border-bottom" *ngFor="let meeting of upcomingMeetings">
-        <div class="row">
-          <div class="col-md-12">
-            <span class="display-4">{{meeting.title}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">
-            {{meeting.startTime}} - {{meeting.endTime}}
-          </div>
-        </div>
+    <div class="col-md-4" *ngFor="let meeting of upcomingMeetings">
+      <div class="row">
+        <span class="display-4">{{meeting.title}}</span>
+      </div>
+      <div class="row">
+        {{meeting.startTime}} - {{meeting.endTime}}
       </div>
     </div>
   </div>
