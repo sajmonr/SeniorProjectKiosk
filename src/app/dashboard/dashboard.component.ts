@@ -3,7 +3,7 @@ import {Meeting} from '../shared/models/meeting.model';
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
+  templateUrl: './dashboard2.component.html',
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
