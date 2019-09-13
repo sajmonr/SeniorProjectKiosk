@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import {Meeting} from '../shared/models/meeting.model';
+import {HttpClient} from '@angular/common/http';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard2.component.html',
+  templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
@@ -19,11 +21,15 @@ export class DashboardComponent implements OnInit {
     //new Meeting('4:30 PM', '6:00 PM', 'Test meeting 4')
   ];
 
-  constructor() { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit() {
     this.refreshDateTime();
     this.clockTimer = setInterval(() => this.refreshDateTime(), 1000);
+  }
+
+  private onSettings(){
+    this.router.navigate(['/settings']);
   }
 
   private refreshDateTime(){
