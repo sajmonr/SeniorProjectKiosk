@@ -11,8 +11,9 @@ import {MetadataTransformer} from '@angular/compiler-cli/src/transformers/metada
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
-  private maxVisibleMeetings = 3;
+  private maxVisibleMeetings = 4;
   private room: string;
+  private showTomorrow = true;
   private clockTimer: number;
   private meetingTimer: number;
   private date: Date;
@@ -26,7 +27,7 @@ export class DashboardComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router, private settings: SettingsService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    this.room = this.activatedRoute.snapshot.params['room'];
+    this.loadRouteParams();
 
     this.settings.initialized.subscribe(init => {
       if(init){
@@ -101,5 +102,12 @@ export class DashboardComponent implements OnInit {
     const difference = (date.getTime() - new Date().getTime()) / 1000 / 60;
 
     return Math.abs(Math.round(difference));
+  }
+
+  private loadRouteParams(){
+    this.room = this.activatedRoute.snapshot.params['room'];
+    if(this.activatedRoute.snapshot.params['tomorrow']){
+      this.showTomorrow =this.activatedRoute.snapshot.params['tomorrow'] == 1;
+    }
   }
 }

@@ -7,6 +7,7 @@ const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
   {path: 'dashboard', component: DashboardComponent},
   {path: 'dashboard/:room', component: DashboardComponent},
+  {path: 'dashboard/:room/:tomorrow', component: DashboardComponent},
   {path: 'settings', component: SettingsComponent}
 ];
 

@@ -49,14 +49,14 @@
         </div>
         <div class="row text-center flex-grow-1 justify-content-center">
           <div class="col-10">
-             <div *ngIf="isLoaded && todaysMeetings.length == 0">
+             <div *ngIf="isLoaded && todaysMeetings.length == 0" class="mt-4">
                <span class="display-4">No more meetings for today</span>
              </div>
             <div *ngFor="let meeting of todaysMeetings" class="meeting-box">
               <span class="d-block meeting-title">{{meeting.title}}</span>
               <span class="d-block meeting-time">{{meeting.startTime | date: 'h:mm aa'}} - {{meeting.endTime | date: 'h:mm aa'}}</span>
             </div>
-            <div *ngIf="isLoaded && tomorrowsMeetings.length > 0" class="mt-5">
+            <div *ngIf="isLoaded && showTomorrow && tomorrowsMeetings.length > 0" class="mt-5">
               <span class="display-4 d-block text-underline">Tomorrow</span>
               <div *ngFor="let meeting of tomorrowsMeetings" class="meeting-box">
                 <span class="d-block meeting-title">{{meeting.title}}</span>
