@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {Meeting} from '../shared/models/meeting.model';
 import {HttpClient} from '@angular/common/http';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {SettingsService} from '../shared/services/settings.service';
+import {MetadataTransformer} from '@angular/compiler-cli/src/transformers/metadata_cache';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,106 +11,95 @@ import {Router} from '@angular/router';
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
-  private vacant = true;
+  private maxVisibleMeetings = 3;
+  private room: string;
   private clockTimer: number;
-  private time: string;
-  private date: string;
+  private meetingTimer: number;
+  private date: Date;
+  private isLoaded = false;
 
-  private upcomingMeetings: Meeting[] = [
-    new Meeting('11:00 AM', '12:15 PM', 'Test meeting 1'),
-    new Meeting('12:30 PM', '1:15 PM', 'Test meeting 2'),
-    new Meeting('1:30 PM', '2:00 PM', 'Test meeting 3'),
-    //new Meeting('4:30 PM', '6:00 PM', 'Test meeting 4')
-  ];
+  private currentMeeting: Meeting;
+  private currentMeetingEndsIn: number;
+  private todaysMeetings: Meeting[] = [];
+  private tomorrowsMeetings: Meeting[] = [];
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private settings: SettingsService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
-    this.refreshDateTime();
-    this.clockTimer = setInterval(() => this.refreshDateTime(), 1000);
+    this.room = this.activatedRoute.snapshot.params['room'];
 
-    this.http.get('http://lvh.me:5000/api/Calendar/CalendarForRoom?hostname=test_hostname').subscribe(result => {
-      console.log('done');
-      console.log(result);
+    this.settings.initialized.subscribe(init => {
+      if(init){
+        this.refreshMeetings();
+      }
     });
 
+    this.refreshDateTime();
+    this.clockTimer = setInterval(() => this.refreshDateTime(), 1000);
+    this.meetingTimer = setInterval(() => this.refreshMeetings(), 1000 * 60);
   }
 
   private onSettings(){
     this.router.navigate(['/settings']);
   }
 
-  private refreshDateTime(){
-    let date = new Date();
-    this.time = this.formatAmPm(date);
-    this.date = this.getDayString(date) + ' ' + this.getDateString(date) + ' ' + this.getMonthString(date) + ', ' + date.getFullYear();
+  private refreshMeetings(){
+    if(!this.settings.serverUrl || !this.room)
+      return;
+
+    this.http.get(this.settings.serverUrl + '/api/Calendar/CalendarForRoom?room=' + this.room).subscribe((meetings: any[]) => {
+      this.createMeetings(meetings.slice(0, 4));
+      this.isLoaded = true;
+    }, error => {
+      console.log('Failed to refresh meetings.');
+      console.log(error);
+    });
   }
 
-  private formatAmPm(date): string {
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    minutes = minutes < 10 ? '0'+minutes : minutes;
-    return hours + ':' + minutes + ' ' + ampm;
-  }
-  private getDayString(date: Date){
-    switch(date.getDay()){
-      case 0:
-        return 'Sun';
-      case 1:
-        return 'Mon';
-      case 2:
-        return 'Tue';
-      case 3:
-        return 'Wed';
-      case 4:
-        return 'Thu';
-      case 5:
-        return 'Fri';
-      case 6:
-        return 'Sat';
+  private createMeetings(meetings: any[]){
+    const currentDate = new Date();
+    const newMeetings: Meeting[] = [];
+    const newTomorrowsMeetings: Meeting[] = [];
+
+    meetings.forEach(meeting => {
+      let m = new Meeting();
+
+      m.startTime = new Date(meeting.start.dateTime);
+      m.endTime = new Date(meeting.end.dateTime);
+      m.title = meeting.summary;
+
+      //Push tomorrows meetings into its own array.
+      //We might want to use it later.
+      if(m.startTime.getDate() == currentDate.getDate()){
+        if(m.startTime < currentDate && m.endTime > currentDate){
+          this.currentMeeting = m;
+        }else{
+          newMeetings.push(m);
+        }
+      }else if(m.startTime.getDate() == currentDate.getDate() + 1){
+        newTomorrowsMeetings.push(m);
+      }
+    });
+
+    this.todaysMeetings = newMeetings.length > this.maxVisibleMeetings ? newMeetings.splice(0, this.maxVisibleMeetings) : newMeetings;
+    if(newMeetings.length < this.maxVisibleMeetings){
+      this.tomorrowsMeetings = newTomorrowsMeetings.splice(0, this.maxVisibleMeetings - newMeetings.length);
     }
   }
-  private getDateString(date: Date): string{
-    switch(date.getDate()){
-      case 1:
-        return '1st';
-      case 2:
-        return '2nd';
-      case 3:
-        return '3rd';
-      default:
-        return date.getDate() + 'th';
+
+  private refreshDateTime(){
+    this.date = new Date();
+    if(this.currentMeeting){
+      this.currentMeetingEndsIn = this.differenceInMinutes(this.currentMeeting.endTime);
     }
   }
-  private getMonthString(date: Date): string{
-    switch(date.getMonth()){
-      case 0:
-        return 'Jan';
-      case 1:
-        return 'Feb';
-      case 2:
-        return 'Mar';
-      case 3:
-        return 'Apr';
-      case 4:
-        return 'May';
-      case 5:
-        return 'Jun';
-      case 6:
-        return 'Jul';
-      case 7:
-        return 'Aug';
-      case 8:
-        return 'Sep';
-      case 9:
-        return 'Oct';
-      case 10:
-        return 'Nov';
-      case 11:
-        return 'Dec';
-    }
+
+  private differenceInMinutes(date): number{
+    if(!date)
+      return;
+
+    const difference = (date.getTime() - new Date().getTime()) / 1000 / 60;
+
+    return Math.abs(Math.round(difference));
   }
 }

@@ -1,3 +1,5 @@
 export class Meeting{
-  constructor(public startTime: string, public endTime: string, public title: string){}
+  title: string;
+  startTime: Date;
+  endTime: Date;
 }

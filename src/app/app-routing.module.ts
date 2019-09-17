@@ -6,6 +6,7 @@ import {SettingsComponent} from './settings/settings.component';
 const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
   {path: 'dashboard', component: DashboardComponent},
+  {path: 'dashboard/:room', component: DashboardComponent},
   {path: 'settings', component: SettingsComponent}
 ];
 
