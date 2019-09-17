@@ -26,6 +26,12 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.refreshDateTime();
     this.clockTimer = setInterval(() => this.refreshDateTime(), 1000);
+
+    this.http.get('http://lvh.me:5000/api/Calendar/CalendarForRoom?hostname=test_hostname').subscribe(result => {
+      console.log('done');
+      console.log(result);
+    });
+
   }
 
   private onSettings(){
