@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {Meeting} from '../shared/models/meeting.model';
+import {Meeting} from '../../shared/models/meeting.model';
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
-import {SettingsService} from '../shared/services/settings.service';
-import {MetadataTransformer} from '@angular/compiler-cli/src/transformers/metadata_cache';
+import {SettingsService} from '../../shared/services/settings.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -48,8 +47,9 @@ export class DashboardComponent implements OnInit {
     if(!this.settings.serverUrl || !this.room)
       return;
 
-    this.http.get(this.settings.serverUrl + '/api/Calendar/CalendarForRoom?room=' + this.room).subscribe((meetings: any[]) => {
-      this.createMeetings(meetings.slice(0, 4));
+    this.http.get(this.settings.serverUrl + '/api/Calendar/CalendarForRoom?room=' + this.room + '&maxEvents=15').subscribe((meetings: any[]) => {
+      console.log(meetings);
+      this.createMeetings(meetings);
       this.isLoaded = true;
     }, error => {
       console.log('Failed to refresh meetings.');
