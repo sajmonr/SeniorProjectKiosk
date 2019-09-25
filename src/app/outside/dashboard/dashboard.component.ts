@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Meeting} from '../../shared/models/meeting.model';
-import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
-import {SettingsService} from '../../shared/services/settings.service';
+import {CalendarService} from '../../shared/services/calendar.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,18 +19,17 @@ export class DashboardComponent implements OnInit {
 
   private currentMeeting: Meeting;
   private currentMeetingEndsIn: number;
-  private todaysMeetings: Meeting[] = [];
-  private tomorrowsMeetings: Meeting[] = [];
 
-  constructor(private http: HttpClient, private router: Router, private settings: SettingsService, private activatedRoute: ActivatedRoute) { }
+  private todayMeetings: Meeting[] = [];
+  private tomorrowMeetings: Meeting[] = [];
+
+  constructor(private activatedRoute: ActivatedRoute, private calendar: CalendarService){}
 
   ngOnInit() {
     this.loadRouteParams();
 
-    this.settings.initialized.subscribe(init => {
-      if(init){
-        this.refreshMeetings();
-      }
+    this.calendar.initialized().subscribe(() => {
+      this.refreshMeetings();
     });
 
     this.refreshDateTime();
@@ -39,53 +37,35 @@ export class DashboardComponent implements OnInit {
     this.meetingTimer = setInterval(() => this.refreshMeetings(), 1000 * 60);
   }
 
-  private onSettings(){
-    this.router.navigate(['/settings']);
-  }
-
-  private refreshMeetings(){
-    if(!this.settings.serverUrl || !this.room)
-      return;
-
-    this.http.get(this.settings.serverUrl + '/api/Calendar/CalendarForRoom?room=' + this.room + '&maxEvents=15').subscribe((meetings: any[]) => {
-      console.log(meetings);
-      this.createMeetings(meetings);
-      this.isLoaded = true;
-    }, error => {
-      console.log('Failed to refresh meetings.');
-      console.log(error);
-    });
-  }
-
-  private createMeetings(meetings: any[]){
-    const currentDate = new Date();
-    const newMeetings: Meeting[] = [];
-    const newTomorrowsMeetings: Meeting[] = [];
+  private organizeMeetings(meetings: Meeting[]) {
+    let today = new Date();
+    const newToday: Meeting[] = [];
+    const newTomorrow: Meeting[] = [];
 
     meetings.forEach(meeting => {
-      let m = new Meeting();
-
-      m.startTime = new Date(meeting.start.dateTime);
-      m.endTime = new Date(meeting.end.dateTime);
-      m.title = meeting.summary;
-
-      //Push tomorrows meetings into its own array.
-      //We might want to use it later.
-      if(m.startTime.getDate() == currentDate.getDate()){
-        if(m.startTime < currentDate && m.endTime > currentDate){
-          this.currentMeeting = m;
+      if(meeting.startTime.getDate() == today.getDate()){
+        if(meeting.startTime < today && meeting.endTime > today){
+          this.currentMeeting = meeting;
         }else{
-          newMeetings.push(m);
+          newToday.push(meeting);
         }
-      }else if(m.startTime.getDate() == currentDate.getDate() + 1){
-        newTomorrowsMeetings.push(m);
+      }else if(meeting.startTime.getDate() == today.getDate() + 1){
+        newTomorrow.push(meeting);
       }
     });
 
-    this.todaysMeetings = newMeetings.length > this.maxVisibleMeetings ? newMeetings.splice(0, this.maxVisibleMeetings) : newMeetings;
-    if(newMeetings.length < this.maxVisibleMeetings){
-      this.tomorrowsMeetings = newTomorrowsMeetings.splice(0, this.maxVisibleMeetings - newMeetings.length);
+    this.todayMeetings = newToday.splice(0, this.maxVisibleMeetings);
+    if(this.todayMeetings.length < this.maxVisibleMeetings){
+      this.tomorrowMeetings = newTomorrow.splice(0, this.maxVisibleMeetings - this.todayMeetings.length);
     }
+  }
+
+  private refreshMeetings(){
+    this.calendar.getEvents(this.room, 15).then(meetings => {
+      console.log('INFO: Meetings refreshed.');
+      this.isLoaded = true;
+      this.organizeMeetings(meetings);
+    });
   }
 
   private refreshDateTime(){

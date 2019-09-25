@@ -11,7 +11,7 @@ import { SpinnerComponent } from './spinner/spinner.component';
 import { InsideComponent } from './inside/inside.component';
 import { OutsideComponent } from './outside/outside.component';
 import {DashboardComponent as InsideDashboardComponent} from './inside/dashboard/dashboard.component'
-import {CalendarService} from './services/calendar.service';
+import {CalendarService} from './shared/services/calendar.service';
 
 @NgModule({
   declarations: [
