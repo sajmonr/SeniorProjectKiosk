@@ -10,13 +10,14 @@ export class CalendarService{
 
   getEvents(room: string, maxEvents?: number): Promise<Meeting[]>{
     return new Promise<Meeting[]>(resolve => {
-      if(!room)
+      if(!room || room === ''){
         resolve([]);
+        return;
+      }
 
       let url = this.getBaseUrl() + 'CalendarForRoom?room=' + room;
       if(maxEvents)
         url += '&maxEvents=' + maxEvents;
-
       this.http.get<any[]>(url).subscribe(result => {
         resolve(this.getMeetings(result));
       });

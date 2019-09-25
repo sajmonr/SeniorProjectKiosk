@@ -21,7 +21,7 @@ font-size: 2.5rem;
 }
 
 .bg-available{
-  background: linear-gradient(to right, #11998e, #3aefd);
+  background: linear-gradient(to right, #11998e, #3aef7d);
 }
 .bg-unavailable{
   background: linear-gradient(to right, #f85032, #7a2828);
@@ -29,16 +29,18 @@ font-size: 2.5rem;
 .bg-waiting{
   background: linear-gradient(to right, #fdc830, #fbb034);
 }
-/*
-red - from: #f85032, to: #7a2828
-yellow - from: #fdc830, to: #fbb034
-green - from: #11998e, to: #3aef7d
- */
 .schedule-pop-button{
   width: 100%;
   position: fixed;
   bottom: 0;
 }
-.modal-dialog{
-  max-width: 100vh !important;
+.modal-fullscreen{
+  .modal-dialog{
+    max-width: 100vw !important;
+  }
+  .modal-content{
+    width: 95vw;
+    height: 95vh;
+    margin: 0 auto;
+  }
 }

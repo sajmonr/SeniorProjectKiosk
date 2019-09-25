@@ -19,9 +19,7 @@ export class DashboardComponent implements OnInit {
 
   private currentMeeting: Meeting;
   private currentMeetingEndsIn: number;
-
-  private todayMeetings: Meeting[] = [];
-  private tomorrowMeetings: Meeting[] = [];
+  private meetings: Meeting[] = [];
 
   constructor(private activatedRoute: ActivatedRoute, private calendar: CalendarService){}
 
@@ -38,33 +36,27 @@ export class DashboardComponent implements OnInit {
   }
 
   private organizeMeetings(meetings: Meeting[]) {
-    let today = new Date();
-    const newToday: Meeting[] = [];
-    const newTomorrow: Meeting[] = [];
+    const today = new Date();
 
     meetings.forEach(meeting => {
-      if(meeting.startTime.getDate() == today.getDate()){
-        if(meeting.startTime < today && meeting.endTime > today){
-          this.currentMeeting = meeting;
-        }else{
-          newToday.push(meeting);
-        }
-      }else if(meeting.startTime.getDate() == today.getDate() + 1){
-        newTomorrow.push(meeting);
+      if(meeting.startTime < today && meeting.endTime > today){
+        this.currentMeeting = meeting;
+        return;
       }
     });
 
-    this.todayMeetings = newToday.splice(0, this.maxVisibleMeetings);
-    if(this.todayMeetings.length < this.maxVisibleMeetings){
-      this.tomorrowMeetings = newTomorrow.splice(0, this.maxVisibleMeetings - this.todayMeetings.length);
-    }
+    this.meetings = meetings;
+
   }
 
   private refreshMeetings(){
     this.calendar.getEvents(this.room, 15).then(meetings => {
-      console.log('INFO: Meetings refreshed.');
+      console.log('INFO: Meetings refreshed on ' + new Date());
       this.isLoaded = true;
       this.organizeMeetings(meetings);
+      if(!this.currentMeeting)
+        this.createDummyCurrentMeeting();
+      this.refreshDateTime();
     });
   }
 
@@ -90,4 +82,17 @@ export class DashboardComponent implements OnInit {
       this.showTomorrow =this.activatedRoute.snapshot.params['tomorrow'] == 1;
     }
   }
+
+  private createDummyCurrentMeeting(){
+    const today = new Date();
+    const meeting = new Meeting();
+
+    meeting.startTime = new Date(today.getTime() - 1000 * 60 * 60);
+    meeting.endTime = new Date(today.getTime() + 1000 * 60 * 58);
+    meeting.title = "Dummy meeting - just for dummies :)";
+
+    this.currentMeeting = meeting;
+    this.meetings.splice(0, 0, meeting);
+  }
+
 }

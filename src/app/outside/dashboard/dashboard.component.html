@@ -4,13 +4,20 @@
       <div class="container text-white">
         <div class="row">
           <div class="col text-center">
-            <span class="display-1">{{room}}</span>
+            <span class="display-1 font-weight-bold">{{room}}</span>
           </div>
         </div>
         <div class="row">
           <div class="col text-center">
             <span class="display-2">
               {{currentMeeting ? 'Unavailable' : 'Available'}}
+            </span>
+          </div>
+        </div>
+        <div class="row" *ngIf="currentMeeting">
+          <div class="col text-center">
+            <span class="display-4">
+              {{currentMeetingEndsIn}} minutes left
             </span>
           </div>
         </div>
@@ -33,12 +40,37 @@
   </div>
 </div>
 
-<div class="modal fade" id="modal-schedule" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade modal-fullscreen" id="modal-schedule" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-body" style="height: 90vh; width: 90vw;">
-        <div class="fullscreen-modal">
-
+      <div class="modal-header border-0">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4 text-center">
+              <span class="display-4">Schedule</span>
+            </div>
+            <div class="col-4 text-right">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col">
+              <span class="display-1">Today</span>
+            </div>
+          </div>
+          <div class="row display-4 border-bottom border-light" *ngFor="let meeting of meetings">
+            <div class="col-6">{{meeting.title}}</div>
+            <div class="col-6 text-right">
+              {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}
+            </div>
+          </div>
         </div>
       </div>
     </div>
