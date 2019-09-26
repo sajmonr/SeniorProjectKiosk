@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {Meeting} from '../../shared/models/meeting.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CalendarService} from '../../shared/services/calendar.service';
+import {MessageService} from '../../shared/services/message.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,10 +23,14 @@ export class DashboardComponent implements OnInit {
   private meetingsToday: Meeting[] = [];
   private meetingsTomorrow: Meeting[] = [];
 
-  constructor(private activatedRoute: ActivatedRoute, private calendar: CalendarService){}
+  constructor(private activatedRoute: ActivatedRoute, private calendar: CalendarService, private message: MessageService){}
 
   ngOnInit() {
     this.loadRouteParams();
+
+    if(!this.room){
+      this.message.error('You have not selected any room. You will not see any results. :(');
+    }
 
     this.calendar.initialized().subscribe(() => {
       this.refreshMeetings();
@@ -61,9 +66,8 @@ export class DashboardComponent implements OnInit {
     this.calendar.getEvents(this.room, 15).then(meetings => {
       console.log('INFO: Meetings refreshed on ' + new Date());
       this.isLoaded = true;
+      this.currentMeeting = null;
       this.organizeMeetings(meetings);
-      if(!this.currentMeeting)
-        this.createDummyCurrentMeeting();
       this.refreshDateTime();
     });
   }
@@ -88,6 +92,14 @@ export class DashboardComponent implements OnInit {
     this.room = this.activatedRoute.snapshot.params['room'];
     if(this.activatedRoute.snapshot.params['tomorrow']){
       this.showTomorrow =this.activatedRoute.snapshot.params['tomorrow'] == 1;
+    }
+  }
+
+  private onDummyMeetingToggle(){
+    if(!this.currentMeeting){
+      this.createDummyCurrentMeeting();
+    }else{
+      this.refreshMeetings();
     }
   }
 

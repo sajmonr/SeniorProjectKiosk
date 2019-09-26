@@ -12,10 +12,13 @@ import { InsideComponent } from './inside/inside.component';
 import { OutsideComponent } from './outside/outside.component';
 import {DashboardComponent as InsideDashboardComponent} from './inside/dashboard/dashboard.component'
 import {CalendarService} from './shared/services/calendar.service';
+import {MessageService} from './shared/services/message.service';
+import {MessageComponent} from './shared/components/message/message.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    MessageComponent,
     OutsideDashboardComponent,
     InsideDashboardComponent,
     SettingsComponent,
@@ -28,7 +31,7 @@ import {CalendarService} from './shared/services/calendar.service';
     AppRoutingModule,
     HttpClientModule
   ],
-  providers: [HttpClient, SettingsService, CalendarService],
+  providers: [HttpClient, SettingsService, CalendarService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -4,7 +4,7 @@
       <div class="container text-white">
         <div class="row">
           <div class="col text-center">
-            <span class="display-1 font-weight-bold">{{room}}</span>
+            <span class="display-1 font-weight-bold" (click)="onDummyMeetingToggle()">{{room}}</span>
           </div>
         </div>
         <div class="row">
@@ -71,16 +71,26 @@
               {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}
             </div>
           </div>
+          <div class="row" *ngIf="meetingsToday.length == 0">
+            <div class="col">
+              <span class="display-4">No meetings today</span>
+            </div>
+          </div>
           <div class="row mt-2 mb-3">
             <div class="col">
               <span class="display-3">Tomorrow</span>
             </div>
           </div>
-          <div class="row display-4 border-bottom border-dark" *ngFor="let meeting of meetingsTomorrow">
+          <div class="row display-4 border-bottom border-secondary" *ngFor="let meeting of meetingsTomorrow">
             <div class="col-6">{{meeting.title}}</div>
             <div class="col-6 text-right">
               {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}
             </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="meetingsTomorrow.length == 0">
+          <div class="col">
+            <span class="display-4">No meetings tomorrow</span>
           </div>
         </div>
       </div>
