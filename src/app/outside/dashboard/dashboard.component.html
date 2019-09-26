@@ -30,9 +30,9 @@
     <div class="container-fluid">
       <div class="row mb-1">
         <div class="col text-center">
-          <div class="d-inline-block" style="cursor: pointer;" data-toggle="modal" data-target="#modal-schedule">
+          <div class="d-inline-block" style="cursor: pointer;" (click)="showSchedule()" data-target="#modal-schedule">
             <img src="/assets/images/icon-up.png"/>
-            <span class="d-block display-3 text-white">Schedule</span>
+            <span class="d-block display-3 text-white">View Schedule</span>
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
   </div>
 </div>
 
-<div class="modal fade modal-fullscreen" id="modal-schedule" tabindex="-1" role="dialog" aria-hidden="true">
+<div #scheduleModal class="modal fade modal-fullscreen" id="modal-schedule" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header border-0">
@@ -48,10 +48,10 @@
           <div class="row">
             <div class="col-4"></div>
             <div class="col-4 text-center">
-              <span class="display-4">Schedule</span>
+              <span class="display-3">Schedule</span>
             </div>
             <div class="col-4 text-right">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close" (click)="hideSchedule()">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -59,38 +59,28 @@
         </div>
       </div>
       <div class="modal-body">
-        <div class="container-fluid">
-          <div class="row mb-3">
+        <app-dashboard-schedule *ngIf="!howToScheduleDisplayed" [meetingsToday]="meetingsToday" [meetingsTomorrow]="meetingsTomorrow"></app-dashboard-schedule>
+        <div class="container" *ngIf="howToScheduleDisplayed">
+          <div class="row text-center">
             <div class="col">
-              <span class="display-3">Today</span>
+              <span class="display-4">How to schedule</span>
             </div>
           </div>
-          <div class="row display-4 border-bottom border-dark" *ngFor="let meeting of meetingsToday">
-            <div class="col-6">{{meeting.title}}</div>
-            <div class="col-6 text-right">
-              {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}
-            </div>
-          </div>
-          <div class="row" *ngIf="meetingsToday.length == 0">
+          <div class="row">
             <div class="col">
-              <span class="display-4">No meetings today</span>
-            </div>
-          </div>
-          <div class="row mt-2 mb-3">
-            <div class="col">
-              <span class="display-3">Tomorrow</span>
-            </div>
-          </div>
-          <div class="row display-4 border-bottom border-secondary" *ngFor="let meeting of meetingsTomorrow">
-            <div class="col-6">{{meeting.title}}</div>
-            <div class="col-6 text-right">
-              {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}
+              <p>Here are instructions on how to do it...</p>
             </div>
           </div>
         </div>
-        <div class="row" *ngIf="meetingsTomorrow.length == 0">
-          <div class="col">
-            <span class="display-4">No meetings tomorrow</span>
+      </div>
+      <div class="modal-footer border-0">
+        <div class="container-fluid">
+          <div class="row text-center">
+            <div class="col">
+              <span style="cursor: pointer;" (click)="howToScheduleDisplayed = !howToScheduleDisplayed">
+                {{howToScheduleDisplayed ? 'Back to schedule' : 'Need to schedule a meeting?'}}
+              </span>
+            </div>
           </div>
         </div>
       </div>

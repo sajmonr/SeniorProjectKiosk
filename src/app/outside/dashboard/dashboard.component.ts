@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Meeting} from '../../shared/models/meeting.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CalendarService} from '../../shared/services/calendar.service';
@@ -10,6 +10,7 @@ import {MessageService} from '../../shared/services/message.service';
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
+  @ViewChild('scheduleModal')scheduleModal: ElementRef;
   private maxVisibleMeetings = 4;
   private room: string;
   private showTomorrow = true;
@@ -17,8 +18,11 @@ export class DashboardComponent implements OnInit {
   private meetingTimer: number;
   private date: Date;
   private isLoaded = false;
+  private howToScheduleDisplayed = false;
 
   private currentMeeting: Meeting;
+  private currentMeetingStarted = false;
+
   private currentMeetingEndsIn: number;
   private meetingsToday: Meeting[] = [];
   private meetingsTomorrow: Meeting[] = [];
@@ -109,10 +113,19 @@ export class DashboardComponent implements OnInit {
 
     meeting.startTime = new Date(today.getTime() - 1000 * 60 * 60);
     meeting.endTime = new Date(today.getTime() + 1000 * 60 * 58);
-    meeting.title = "Dummy meeting - just for dummies :)";
+    meeting.title = "Dummy meeting. Nothing here. :)";
 
     this.currentMeeting = meeting;
     this.meetingsToday.splice(0, 0, meeting);
   }
 
+  private showSchedule(){
+    //@ts-ignore
+    $(this.scheduleModal.nativeElement).modal('show');
+  }
+  private hideSchedule(){
+    this.howToScheduleDisplayed = false;
+    //@ts-ignore
+    $(this.scheduleModal.nativeElement).modal('hide');
+  }
 }

@@ -14,6 +14,7 @@ import {DashboardComponent as InsideDashboardComponent} from './inside/dashboard
 import {CalendarService} from './shared/services/calendar.service';
 import {MessageService} from './shared/services/message.service';
 import {MessageComponent} from './shared/components/message/message.component';
+import { ScheduleComponent } from './outside/dashboard/dashboard.schedule/dashboard.schedule.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import {MessageComponent} from './shared/components/message/message.component';
     SettingsComponent,
     SpinnerComponent,
     InsideComponent,
-    OutsideComponent
+    OutsideComponent,
+    ScheduleComponent
   ],
   imports: [
     BrowserModule,

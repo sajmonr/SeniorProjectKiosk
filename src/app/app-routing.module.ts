@@ -8,7 +8,8 @@ const routes: Routes = [
   {path: '', redirectTo: 'outside', pathMatch: 'full'},
   {path: 'inside', children: [
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-      {path: 'dashboard', component: InsideDashboardComponent}
+      {path: 'dashboard', component: InsideDashboardComponent},
+      {path: 'dashboard/:room', component: InsideDashboardComponent}
     ]},
   {path: 'outside', children: [
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
