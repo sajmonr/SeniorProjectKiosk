@@ -60,12 +60,23 @@
       </div>
       <div class="modal-body">
         <div class="container-fluid">
-          <div class="row">
+          <div class="row mb-3">
             <div class="col">
-              <span class="display-1">Today</span>
+              <span class="display-3">Today</span>
             </div>
           </div>
-          <div class="row display-4 border-bottom border-light" *ngFor="let meeting of meetings">
+          <div class="row display-4 border-bottom border-dark" *ngFor="let meeting of meetingsToday">
+            <div class="col-6">{{meeting.title}}</div>
+            <div class="col-6 text-right">
+              {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}
+            </div>
+          </div>
+          <div class="row mt-2 mb-3">
+            <div class="col">
+              <span class="display-3">Tomorrow</span>
+            </div>
+          </div>
+          <div class="row display-4 border-bottom border-dark" *ngFor="let meeting of meetingsTomorrow">
             <div class="col-6">{{meeting.title}}</div>
             <div class="col-6 text-right">
               {{meeting.startTime | date: 'h:mma'}} - {{meeting.endTime | date: 'h:mma'}}

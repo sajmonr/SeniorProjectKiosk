@@ -19,7 +19,8 @@ export class DashboardComponent implements OnInit {
 
   private currentMeeting: Meeting;
   private currentMeetingEndsIn: number;
-  private meetings: Meeting[] = [];
+  private meetingsToday: Meeting[] = [];
+  private meetingsTomorrow: Meeting[] = [];
 
   constructor(private activatedRoute: ActivatedRoute, private calendar: CalendarService){}
 
@@ -37,16 +38,23 @@ export class DashboardComponent implements OnInit {
 
   private organizeMeetings(meetings: Meeting[]) {
     const today = new Date();
+    const newToday: Meeting[] = [];
+    const newTomorrow: Meeting[] = [];
 
     meetings.forEach(meeting => {
-      if(meeting.startTime < today && meeting.endTime > today){
-        this.currentMeeting = meeting;
-        return;
+      if(meeting.startTime.getDate() == today.getDate()){
+        if(meeting.startTime < today && meeting.endTime > today){
+          this.currentMeeting = meeting;
+        }else{
+          newToday.push(meeting);
+        }
+      }else if(meeting.startTime.getDate() == today.getDate() + 1){
+        newTomorrow.push(meeting);
       }
     });
 
-    this.meetings = meetings;
-
+    this.meetingsToday = newToday;
+    this.meetingsTomorrow = newTomorrow;
   }
 
   private refreshMeetings(){
@@ -92,7 +100,7 @@ export class DashboardComponent implements OnInit {
     meeting.title = "Dummy meeting - just for dummies :)";
 
     this.currentMeeting = meeting;
-    this.meetings.splice(0, 0, meeting);
+    this.meetingsToday.splice(0, 0, meeting);
   }
 
 }
