@@ -1,8 +1,10 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Meeting} from '../../shared/models/meeting.model';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {CalendarService} from '../../shared/services/calendar.service';
 import {MessageService} from '../../shared/services/message.service';
+import {RoomService} from '../../shared/services/room.service';
+import {RoomDevice, RoomDeviceType} from '../../shared/models/room-device.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,11 +16,13 @@ export class DashboardComponent implements OnInit {
   private maxVisibleMeetings = 4;
   private room: string;
   private showTomorrow = true;
-  private clockTimer: number;
-  private meetingTimer: number;
+  private clockTimer;
   private date: Date;
   private isLoaded = false;
   private howToScheduleDisplayed = false;
+  private roomDevice: RoomDevice;
+  private connected = false;
+  private subscribed = false;
 
   private currentMeeting: Meeting;
   private currentMeetingStarted = false;
@@ -27,69 +31,80 @@ export class DashboardComponent implements OnInit {
   private meetingsToday: Meeting[] = [];
   private meetingsTomorrow: Meeting[] = [];
 
-  constructor(private activatedRoute: ActivatedRoute, private calendar: CalendarService, private message: MessageService){}
-
-  ngOnInit() {
+  constructor(private activatedRoute: ActivatedRoute, private message: MessageService, private roomService: RoomService){
     this.loadRouteParams();
 
+    this.roomDevice = new RoomDevice();
+    this.roomDevice.type = RoomDeviceType.OutsideKiosk;
+    this.roomDevice.name = this.room + ' Outside Kiosk';
+  }
+
+  ngOnInit() {
     if(!this.room){
       this.message.error('You have not selected any room. You will not see any results. :(');
     }
 
-    this.calendar.initialized().subscribe(() => {
-      this.refreshMeetings();
-    });
+    this.roomService.connected.subscribe(this.onConnected.bind(this));
+    this.roomService.disconnected.subscribe(this.onDisconnected.bind(this));
 
     this.refreshDateTime();
     this.clockTimer = setInterval(() => this.refreshDateTime(), 1000);
-    this.meetingTimer = setInterval(() => this.refreshMeetings(), 1000 * 60);
+  }
+
+  private onConnected(){
+    this.connected = true;
+    this.roomService.getMeetings(this.room, this.maxVisibleMeetings).then(meetings => this.refreshMeetings(meetings));
+    this.roomService.subscribe(this.room, this.roomDevice).then(result => {
+      if(!this.subscribed) {
+        this.subscribed = true;
+        this.roomService.meetingsUpdated.subscribe(meetings => this.refreshMeetings(meetings));
+      }
+    });
+  }
+
+  private onDisconnected(){
+    this.connected = false;
   }
 
   private organizeMeetings(meetings: Meeting[]) {
     const today = new Date();
+    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
     const newToday: Meeting[] = [];
     const newTomorrow: Meeting[] = [];
 
-    meetings.forEach(meeting => {
-      if(meeting.startTime.getDate() == today.getDate()){
-        if(meeting.startTime < today && meeting.endTime > today){
-          this.currentMeeting = meeting;
+    let meetingIndex = 0;
+
+    while(meetingIndex < meetings.length && newToday.length + newTomorrow.length < this.maxVisibleMeetings){
+      if(meetings[meetingIndex].startTime.getDate() == today.getDate()){
+        if(meetings[meetingIndex].startTime.getTime() < today.getTime() && meetings[meetingIndex].endTime.getTime() > today.getTime()){
+          this.currentMeeting = meetings[meetingIndex];
         }else{
-          newToday.push(meeting);
+          newToday.push(meetings[meetingIndex]);
         }
-      }else if(meeting.startTime.getDate() == today.getDate() + 1){
-        newTomorrow.push(meeting);
+      }else if(meetings[meetingIndex].startTime.getDate() == tomorrow.getDate()){
+        newTomorrow.push(meetings[meetingIndex]);
       }
-    });
+      meetingIndex++;
+    }
 
     this.meetingsToday = newToday;
     this.meetingsTomorrow = newTomorrow;
   }
 
-  private refreshMeetings(){
-    this.calendar.getEvents(this.room, 15).then(meetings => {
-      console.log('INFO: Meetings refreshed on ' + new Date());
-      this.isLoaded = true;
-      this.currentMeeting = null;
-      this.organizeMeetings(meetings);
-      this.refreshDateTime();
-    });
+  private refreshMeetings(meetings: Meeting[]){
+    console.log('INFO: Meetings refreshed on ' + new Date());
+    this.isLoaded = true;
+    this.currentMeeting = null;
+    this.organizeMeetings(meetings);
+
+    this.refreshDateTime();
   }
 
   private refreshDateTime(){
     this.date = new Date();
     if(this.currentMeeting){
-      this.currentMeetingEndsIn = this.differenceInMinutes(this.currentMeeting.endTime);
+      this.currentMeetingEndsIn = this.currentMeeting.endTime.getTime() - new Date().getTime();
     }
-  }
-
-  private differenceInMinutes(date): number{
-    if(!date)
-      return;
-
-    const difference = (date.getTime() - new Date().getTime()) / 1000 / 60;
-
-    return Math.abs(Math.round(difference));
   }
 
   private loadRouteParams(){
@@ -103,7 +118,7 @@ export class DashboardComponent implements OnInit {
     if(!this.currentMeeting){
       this.createDummyCurrentMeeting();
     }else{
-      this.refreshMeetings();
+      //this.refreshMeetings();
     }
   }
 

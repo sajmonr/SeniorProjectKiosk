@@ -15,6 +15,11 @@ import {CalendarService} from './shared/services/calendar.service';
 import {MessageService} from './shared/services/message.service';
 import {MessageComponent} from './shared/components/message/message.component';
 import { ScheduleComponent } from './outside/dashboard/dashboard.schedule/dashboard.schedule.component';
+import {RoomService} from './shared/services/room.service';
+import {TimePipe} from './shared/pipes/time.pipe';
+import { WelcomeComponent } from './inside/welcome/welcome.component';
+import {TimingService} from './shared/services/timing.service';
+import {NgCircleProgressModule} from 'ng-circle-progress';
 
 @NgModule({
   declarations: [
@@ -26,14 +31,22 @@ import { ScheduleComponent } from './outside/dashboard/dashboard.schedule/dashbo
     SpinnerComponent,
     InsideComponent,
     OutsideComponent,
-    ScheduleComponent
+    ScheduleComponent,
+    TimePipe,
+    WelcomeComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    NgCircleProgressModule.forRoot({
+      "radius": 60,
+      "maxPercent": 100,
+      "clockwise": false,
+      "animation": false
+    })
   ],
-  providers: [HttpClient, SettingsService, CalendarService, MessageService],
+  providers: [HttpClient, SettingsService, CalendarService, MessageService, RoomService, TimingService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

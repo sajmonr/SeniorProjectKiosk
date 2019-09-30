@@ -1,4 +1,4 @@
-<div class="container-fluid h-100" [ngClass]="{'bg-available': !currentMeeting, 'bg-unavailable': currentMeeting}">
+<div class="container-fluid h-100" [ngClass]="{'bg-available': connected && !currentMeeting, 'bg-unavailable': connected && currentMeeting, 'bg-waiting': !connected}">
   <div class="row h-100 align-items-center">
     <div class="col">
       <div class="container text-white">
@@ -10,14 +10,14 @@
         <div class="row">
           <div class="col text-center">
             <span class="display-2">
-              {{currentMeeting ? 'Unavailable' : 'Available'}}
+              {{connected ? (currentMeeting ? 'Unavailable' : 'Available') : 'Waiting for connection'}}
             </span>
           </div>
         </div>
-        <div class="row" *ngIf="currentMeeting">
+        <div class="row" *ngIf="connected && currentMeeting">
           <div class="col text-center">
             <span class="display-4">
-              {{currentMeetingEndsIn}} minutes left
+              {{currentMeetingEndsIn | time}} left
             </span>
           </div>
         </div>
@@ -25,8 +25,7 @@
     </div>
   </div>
 </div>
-<div>
-  <div class="schedule-pop-button mb-4">
+  <div class="schedule-pop-button mb-4" *ngIf="connected">
     <div class="container-fluid">
       <div class="row mb-1">
         <div class="col text-center">
@@ -38,7 +37,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <div #scheduleModal class="modal fade modal-fullscreen" id="modal-schedule" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -48,7 +46,7 @@
           <div class="row">
             <div class="col-4"></div>
             <div class="col-4 text-center">
-              <span class="display-3">Schedule</span>
+              <span class="display-3">Upcoming meetings</span>
             </div>
             <div class="col-4 text-right">
               <button type="button" class="close" (click)="hideSchedule()">
