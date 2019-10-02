@@ -53,7 +53,7 @@ export class DashboardComponent implements OnInit {
 
   private onConnected(){
     this.connected = true;
-    this.roomService.getMeetings(this.room, this.maxVisibleMeetings).then(meetings => this.refreshMeetings(meetings));
+    //this.roomService.getMeetings(this.room, this.maxVisibleMeetings).then(meetings => this.refreshMeetings(meetings));
     this.roomService.subscribe(this.room, this.roomDevice).then(result => {
       if(!this.subscribed) {
         this.subscribed = true;

@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import {DashboardComponent as OutsideDashboardComponent} from './outside/dashboard/dashboard.component';
 import {DashboardComponent as InsideDashboardComponent} from './inside/dashboard/dashboard.component';
 import {SettingsComponent} from './settings/settings.component';
+import {CookieGuard} from './cookie.guard';
 
 const routes: Routes = [
   {path: '', redirectTo: 'outside', pathMatch: 'full'},

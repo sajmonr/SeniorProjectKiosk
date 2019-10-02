@@ -1,4 +1,4 @@
-<div class="container-fluid h-100 bg-dark" [ngClass]="{'bg-available': !currentMeeting, 'bg-unavailable': currentMeeting}">
+<div class="container-fluid h-100 bg-dark">
   <div class="row h-100 align-items-center">
     <div class="col-6 text-center">
       <circle-progress
@@ -6,7 +6,7 @@
         radius="150"
         outerStrokeWidth="20"
         innerStrokeWidth="0"
-        outerStrokeColor="#78C000"
+        [outerStrokeColor]="clockColor"
         [showSubtitle]="false"
         [showUnits]="false"
         [title]="currentMeetingEndsIn | time: true"
@@ -23,7 +23,7 @@
         </div>
         <div class="row">
           <div class="col text-center">
-            <span class="display-3 font-weight-bold">Welcome Adam Simonicek</span>
+            <span class="display-3 font-weight-bold">Welcome {{currentMeeting ? currentMeeting.owner : ''}}</span>
           </div>
         </div>
         <div class="row">
@@ -44,7 +44,7 @@
         <div class="col text-center">
           <div class="d-inline-block" style="cursor: pointer;" data-toggle="modal" data-target="#modal-schedule">
             <img src="/assets/images/icon-up.png"/>
-            <span class="d-block display-3 text-white">Information</span>
+            <span class="d-block display-3 text-white">Schedule</span>
           </div>
         </div>
       </div>
@@ -75,3 +75,8 @@
     </div>
   </div>
 </div>
+</div>
+<audio #alertSound>
+  <source src='/assets/sounds/insight.mp3' type="audio/mp3">
+</audio>
+<app-time-alert *ngIf="remainingTimeAlert" [time]="currentMeetingEndsIn" class="alert-fullscreen bg-unavailable text-white"></app-time-alert>

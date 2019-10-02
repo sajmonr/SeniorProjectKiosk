@@ -3,6 +3,7 @@ import {Message, MessageType} from "../models/message.model";
 
 export class MessageService{
   @Output()messageReceived = new EventEmitter<Message>();
+  @Output()hide = new EventEmitter();
 
   info(message: string, title?: string){
     if(!title) {
@@ -21,6 +22,9 @@ export class MessageService{
       title = 'Success';
     }
     this.messageReceived.emit(this.constructMessage(title, message, MessageType.Success));
+  }
+  hideMessage(){
+    this.hide.emit();
   }
   private constructMessage(title: string, message: string, type: MessageType): Message{
     const msg = new Message();

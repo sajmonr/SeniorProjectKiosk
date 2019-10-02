@@ -26,11 +26,14 @@ export class TimePipe implements PipeTransform{
       output += hours == 1 ? ' hour ' : ' hours ';
     }
 
-    output += showSeconds ? minutes + (hours * 60) : minutes;
-    output += minutes == 1 ? ' minute' : ' minutes';
+    if(minutes > 0) {
+      output += showSeconds ? minutes + (hours * 60) : minutes;
+      output += minutes == 1 ? ' minute' : ' minutes';
+    }
 
-    if(showSeconds){
-      output += ' ';
+    if(showSeconds || minutes == 0){
+      if(minutes > 0)
+        output += ' ';
       output += seconds;
       output += seconds == 1 ? ' second' : ' seconds';
     }

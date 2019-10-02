@@ -20,6 +20,9 @@ import {TimePipe} from './shared/pipes/time.pipe';
 import { WelcomeComponent } from './inside/welcome/welcome.component';
 import {TimingService} from './shared/services/timing.service';
 import {NgCircleProgressModule} from 'ng-circle-progress';
+import {CookieGuard} from './cookie.guard';
+import {CookieService} from 'ngx-cookie-service';
+import { TimeAlertComponent } from './inside/dashboard/time-alert/time-alert.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +36,8 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
     OutsideComponent,
     ScheduleComponent,
     TimePipe,
-    WelcomeComponent
+    WelcomeComponent,
+    TimeAlertComponent
   ],
   imports: [
     BrowserModule,
@@ -46,7 +50,7 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
       "animation": false
     })
   ],
-  providers: [HttpClient, SettingsService, CalendarService, MessageService, RoomService, TimingService],
+  providers: [HttpClient, CookieGuard, CookieService, SettingsService, CalendarService, MessageService, RoomService, TimingService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

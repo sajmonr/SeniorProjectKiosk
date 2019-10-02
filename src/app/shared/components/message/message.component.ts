@@ -17,6 +17,7 @@ export class MessageComponent implements OnInit{
   ngOnInit(): void {
     this.clearMessage();
     this.messageService.messageReceived.subscribe(message => this.onMessageReceived(message));
+    this.messageService.hide.subscribe(this.hide.bind(this));
   }
 
   private onMessageReceived(message: Message){
