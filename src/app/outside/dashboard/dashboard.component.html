@@ -1,4 +1,4 @@
-<div class="container-fluid h-100" [ngClass]="{'bg-available': connected && !currentMeeting, 'bg-unavailable': connected && currentMeeting, 'bg-waiting': !connected}">
+<div class="container-fluid h-100" [ngClass]="{'bg-waiting': !firstTimeLoad ,'bg-available': connected && subscribed && !currentMeeting, 'bg-unavailable': connected && subscribed && currentMeeting}">
   <div class="row h-100 align-items-center">
     <div class="col">
       <div class="container text-white">
@@ -10,7 +10,7 @@
         <div class="row">
           <div class="col text-center">
             <span class="display-2">
-              {{connected ? (currentMeeting ? 'Unavailable' : 'Available') : 'Waiting for connection'}}
+              {{connected && subscribed && firstTimeLoad ? (currentMeeting ? 'Unavailable' : 'Available') : (firstTimeLoad ? 'Waiting for connection' : 'Loading meetings')}}
             </span>
           </div>
         </div>

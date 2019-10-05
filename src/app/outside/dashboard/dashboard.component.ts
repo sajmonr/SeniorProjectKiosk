@@ -23,6 +23,7 @@ export class DashboardComponent implements OnInit {
   private roomDevice: RoomDevice;
   private connected = false;
   private subscribed = false;
+  private firstTimeLoad = false;
 
   private currentMeeting: Meeting;
   private currentMeetingStarted = false;
@@ -57,7 +58,11 @@ export class DashboardComponent implements OnInit {
     this.roomService.subscribe(this.room, this.roomDevice).then(result => {
       if(!this.subscribed) {
         this.subscribed = true;
-        this.roomService.meetingsUpdated.subscribe(meetings => this.refreshMeetings(meetings));
+        this.roomService.meetingsUpdated.subscribe(meetings => {
+          if(!this.firstTimeLoad)
+            this.firstTimeLoad = true;
+          this.refreshMeetings(meetings);
+        });
       }
     });
   }
