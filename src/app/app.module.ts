@@ -23,6 +23,8 @@ import {NgCircleProgressModule} from 'ng-circle-progress';
 import {CookieGuard} from './cookie.guard';
 import {CookieService} from 'ngx-cookie-service';
 import { TimeAlertComponent } from './inside/dashboard/time-alert/time-alert.component';
+import {SetupComponent} from './setup/setup.component';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -37,18 +39,20 @@ import { TimeAlertComponent } from './inside/dashboard/time-alert/time-alert.com
     ScheduleComponent,
     TimePipe,
     WelcomeComponent,
-    TimeAlertComponent
+    TimeAlertComponent,
+    SetupComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     NgCircleProgressModule.forRoot({
-      "radius": 60,
-      "maxPercent": 100,
-      "clockwise": false,
-      "animation": false
-    })
+      'radius': 60,
+      'maxPercent': 100,
+      'clockwise': false,
+      'animation': false
+    }),
+    FormsModule
   ],
   providers: [HttpClient, CookieGuard, CookieService, SettingsService, CalendarService, MessageService, RoomService, TimingService],
   bootstrap: [AppComponent]

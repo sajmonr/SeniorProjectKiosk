@@ -78,7 +78,10 @@ export class InsideComponent implements OnInit{
   }
 
   private loadRouteParams(){
-    this.room = this.activatedRoute.snapshot.params['room'];
+    const room = localStorage.getItem('room');
+    if(!room)
+      this.router.navigate(['/setup']);
+    this.room = room;
   }
 
   private isCurrentMeeting(meeting: Meeting): boolean{

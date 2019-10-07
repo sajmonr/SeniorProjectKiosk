@@ -3,23 +3,16 @@ import {HttpClient} from '@angular/common/http';
 import {SettingsService} from './settings.service';
 import {Observable} from 'rxjs';
 import {Meeting} from '../models/meeting.model';
+import {MeetingRoom} from '../models/meeting-room.model';
 
 @Injectable()
 export class CalendarService{
   constructor(private http: HttpClient, private settings: SettingsService){}
 
-  getEvents(room: string, maxEvents?: number): Promise<Meeting[]>{
-    return new Promise<Meeting[]>(resolve => {
-      if(!room || room === ''){
-        resolve([]);
-        return;
-      }
-
-      let url = this.getBaseUrl() + 'CalendarForRoom?room=' + room;
-      if(maxEvents)
-        url += '&maxEvents=' + maxEvents;
-      this.http.get<any[]>(url).subscribe(result => {
-        resolve(this.getMeetings(result));
+  getRooms(): Promise<MeetingRoom[]>{
+    return new Promise<MeetingRoom[]>(resolve => {
+      this.http.get<MeetingRoom[]>(this.getBaseUrl() + 'Room/GetMeetingRooms').subscribe(rooms => {
+        resolve(rooms);
       });
     });
   }
@@ -45,7 +38,7 @@ export class CalendarService{
   }
 
   private getBaseUrl(): string{
-    return this.settings.serverUrl + 'Calendar/';
+    return this.settings.serverUrl;
   }
 
 }

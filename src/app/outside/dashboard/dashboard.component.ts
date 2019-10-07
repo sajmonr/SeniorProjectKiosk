@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Meeting} from '../../shared/models/meeting.model';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {CalendarService} from '../../shared/services/calendar.service';
 import {MessageService} from '../../shared/services/message.service';
 import {RoomService} from '../../shared/services/room.service';
@@ -32,7 +32,7 @@ export class DashboardComponent implements OnInit {
   private meetingsToday: Meeting[] = [];
   private meetingsTomorrow: Meeting[] = [];
 
-  constructor(private activatedRoute: ActivatedRoute, private message: MessageService, private roomService: RoomService){
+  constructor(private activatedRoute: ActivatedRoute, private message: MessageService, private roomService: RoomService, private router: Router){
     this.loadRouteParams();
 
     this.roomDevice = new RoomDevice();
@@ -54,13 +54,11 @@ export class DashboardComponent implements OnInit {
 
   private onConnected(){
     this.connected = true;
-    //this.roomService.getMeetings(this.room, this.maxVisibleMeetings).then(meetings => this.refreshMeetings(meetings));
+    this.roomService.getMeetings(this.room, this.maxVisibleMeetings).then(meetings => this.refreshMeetings(meetings));
     this.roomService.subscribe(this.room, this.roomDevice).then(result => {
       if(!this.subscribed) {
         this.subscribed = true;
         this.roomService.meetingsUpdated.subscribe(meetings => {
-          if(!this.firstTimeLoad)
-            this.firstTimeLoad = true;
           this.refreshMeetings(meetings);
         });
       }
@@ -97,6 +95,8 @@ export class DashboardComponent implements OnInit {
   }
 
   private refreshMeetings(meetings: Meeting[]){
+    if(!this.firstTimeLoad)
+      this.firstTimeLoad = true;
     console.log('INFO: Meetings refreshed on ' + new Date());
     this.isLoaded = true;
     this.currentMeeting = null;
@@ -113,7 +113,11 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadRouteParams(){
-    this.room = this.activatedRoute.snapshot.params['room'];
+    const room = localStorage.getItem('room');
+    if(!room)
+      this.router.navigate(['/setup']);
+
+    this.room = room;
     if(this.activatedRoute.snapshot.params['tomorrow']){
       this.showTomorrow =this.activatedRoute.snapshot.params['tomorrow'] == 1;
     }
