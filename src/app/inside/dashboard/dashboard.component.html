@@ -2,14 +2,14 @@
   <div class="row h-100 align-items-center">
     <div class="col-6 text-center">
       <circle-progress
-        [percent]="100 - currentMeetingProgress"
+        [percent]="(1 - meetingProgress) * 100"
         radius="150"
         outerStrokeWidth="20"
         innerStrokeWidth="0"
-        [outerStrokeColor]="clockColor"
+        [outerStrokeColor]="progressColor"
         [showSubtitle]="false"
         [showUnits]="false"
-        [title]="currentMeetingEndsIn | time: true"
+        [title]="meetingEndsIn | time: true"
         titleColor="#ffffff"
         titleFontSize="25"
       ></circle-progress>
@@ -23,13 +23,13 @@
         </div>
         <div class="row">
           <div class="col text-center">
-            <span class="display-3 font-weight-bold">Welcome {{currentMeeting ? currentMeeting.owner : ''}}</span>
+            <span class="display-3 font-weight-bold">Welcome {{meeting ? meeting.owner : ''}}</span>
           </div>
         </div>
         <div class="row">
           <div class="col text-center">
             <span class="display-4">
-              {{currentMeeting ? currentMeeting.title : 'No title'}}
+              {{meeting ? meeting.title : 'No title'}}
             </span>
           </div>
         </div>
@@ -37,46 +37,8 @@
     </div>
   </div>
 </div>
-<div>
-  <div class="schedule-pop-button mb-4">
-    <div class="container-fluid">
-      <div class="row mb-1">
-        <div class="col text-center">
-          <div class="d-inline-block" style="cursor: pointer;" data-toggle="modal" data-target="#modal-schedule">
-            <img src="/assets/images/icon-up.png"/>
-            <span class="d-block display-3 text-white">Schedule</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="modal fade modal-fullscreen" id="modal-info" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header border-0">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-4"></div>
-            <div class="col-4 text-center">
-              <span class="display-3">Upcoming meetings</span>
-            </div>
-            <div class="col-4 text-right">
-              <button type="button" class="close" data-toggle="modal">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-body">
-
-    </div>
-  </div>
-</div>
-</div>
 <audio #alertSound>
   <source src='/assets/sounds/insight.mp3' type="audio/mp3">
 </audio>
-<app-time-alert *ngIf="remainingTimeAlert" [time]="currentMeetingEndsIn" class="alert-fullscreen bg-unavailable text-white"></app-time-alert>
+<app-time-alert *ngIf="remainingTimeAlert" [time]="meetingEndsIn" class="alert-fullscreen bg-unavailable text-white"></app-time-alert>

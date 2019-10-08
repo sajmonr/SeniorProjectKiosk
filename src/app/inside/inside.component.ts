@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {RoomDevice, RoomDeviceType} from '../shared/models/room-device.model';
 import {Meeting} from '../shared/models/meeting.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MessageService} from '../shared/services/message.service';
 import {RoomService} from '../shared/services/room.service';
 import {TimingService} from '../shared/services/timing.service';
-import {normalizeExtraEntryPoints} from '@angular-devkit/build-angular/src/angular-cli-files/models/webpack-configs';
 
 @Component({
   selector: 'app-inside',
@@ -13,12 +12,18 @@ import {normalizeExtraEntryPoints} from '@angular-devkit/build-angular/src/angul
   styleUrls: ['./inside.component.less']
 })
 export class InsideComponent implements OnInit{
+  @ViewChild('scheduleModal')scheduleModal: ElementRef;
+  private demoMode = false;
   private roomDevice: RoomDevice;
   private room: string;
   private loaded = false;
+  private maxVisibleMeetings = 4;
 
   private currentMeeting: Meeting;
   private nextMeeting: Meeting;
+
+  private howToScheduleDisplayed = false;
+  private meetings: Meeting[] = [];
 
   constructor(private activatedRoute: ActivatedRoute,
               private router: Router,
@@ -50,18 +55,12 @@ export class InsideComponent implements OnInit{
   }
 
   private refreshMeetings(meetings: Meeting[]){
-    let m = new Meeting();
-    m.owner = 'Adam Simonicek';
-    m.title = 'Test';
-    m.startTime = new Date();
-    m.endTime = new Date();
-
-    m.endTime.setTime(m.startTime.getTime() + 1000 * 60 * 60);
-
-    if(!m.equal(this.currentMeeting)){
-      //this.currentMeeting = m;
+    console.log('meetings updated');
+    this.meetings = meetings;
+    if(this.demoMode){
+      this.setDemo();
+      return;
     }
-
     let currentMeeting;
     let nextMeeting;
 
@@ -73,15 +72,49 @@ export class InsideComponent implements OnInit{
       nextMeeting = meetings[0];
     }
 
-    this.currentMeeting = currentMeeting;
-    this.nextMeeting = nextMeeting;
+    if(!this.currentMeeting || !this.currentMeeting.equal(currentMeeting))
+      this.currentMeeting = currentMeeting;
+    if(!this.nextMeeting || !this.nextMeeting.equal(nextMeeting))
+      this.nextMeeting = nextMeeting;
   }
 
+  private setDemo(){
+    let m = new Meeting();
+
+    m.owner = 'Adam Simonicek';
+    m.title = 'Demo meeting';
+    m.startTime = new Date();
+    m.endTime = new Date();
+
+    //m.startTime.setTime(m.startTime.getTime() - 1000 * 60 * 4);
+    m.endTime.setTime(m.startTime.getTime() + 1000 * 60 * 5);
+
+    if(!this.currentMeeting || this.currentMeeting.title != m.title){
+      this.currentMeeting = m;
+    }
+
+    if(this.currentMeeting && this.currentMeeting.endTime.getTime() < new Date().getTime())
+      this.currentMeeting = null;
+
+  }
+
+  private showSchedule(){
+    //@ts-ignore
+    $(this.scheduleModal.nativeElement).modal('show');
+  }
+  private hideSchedule(){
+    this.howToScheduleDisplayed = false;
+    //@ts-ignore
+    $(this.scheduleModal.nativeElement).modal('hide');
+  }
   private loadRouteParams(){
     const room = localStorage.getItem('room');
     if(!room)
       this.router.navigate(['/setup']);
     this.room = room;
+
+    const mode = this.activatedRoute.snapshot.params['mode'];
+    this.demoMode = mode && mode == 'demo';
   }
 
   private isCurrentMeeting(meeting: Meeting): boolean{

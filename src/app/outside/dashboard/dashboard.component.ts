@@ -1,7 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Meeting} from '../../shared/models/meeting.model';
 import {ActivatedRoute, Router} from '@angular/router';
-import {CalendarService} from '../../shared/services/calendar.service';
 import {MessageService} from '../../shared/services/message.service';
 import {RoomService} from '../../shared/services/room.service';
 import {RoomDevice, RoomDeviceType} from '../../shared/models/room-device.model';
@@ -29,8 +28,7 @@ export class DashboardComponent implements OnInit {
   private currentMeetingStarted = false;
 
   private currentMeetingEndsIn: number;
-  private meetingsToday: Meeting[] = [];
-  private meetingsTomorrow: Meeting[] = [];
+  private meetings: Meeting[] = [];
 
   constructor(private activatedRoute: ActivatedRoute, private message: MessageService, private roomService: RoomService, private router: Router){
     this.loadRouteParams();
@@ -69,38 +67,13 @@ export class DashboardComponent implements OnInit {
     this.connected = false;
   }
 
-  private organizeMeetings(meetings: Meeting[]) {
-    const today = new Date();
-    const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
-    const newToday: Meeting[] = [];
-    const newTomorrow: Meeting[] = [];
-
-    let meetingIndex = 0;
-
-    while(meetingIndex < meetings.length && newToday.length + newTomorrow.length < this.maxVisibleMeetings){
-      if(meetings[meetingIndex].startTime.getDate() == today.getDate()){
-        if(meetings[meetingIndex].startTime.getTime() < today.getTime() && meetings[meetingIndex].endTime.getTime() > today.getTime()){
-          this.currentMeeting = meetings[meetingIndex];
-        }else{
-          newToday.push(meetings[meetingIndex]);
-        }
-      }else if(meetings[meetingIndex].startTime.getDate() == tomorrow.getDate()){
-        newTomorrow.push(meetings[meetingIndex]);
-      }
-      meetingIndex++;
-    }
-
-    this.meetingsToday = newToday;
-    this.meetingsTomorrow = newTomorrow;
-  }
-
   private refreshMeetings(meetings: Meeting[]){
     if(!this.firstTimeLoad)
       this.firstTimeLoad = true;
     console.log('INFO: Meetings refreshed on ' + new Date());
     this.isLoaded = true;
     this.currentMeeting = null;
-    this.organizeMeetings(meetings);
+    this.meetings = meetings;
 
     this.refreshDateTime();
   }
@@ -140,7 +113,7 @@ export class DashboardComponent implements OnInit {
     meeting.title = "Dummy meeting. Nothing here. :)";
 
     this.currentMeeting = meeting;
-    this.meetingsToday.splice(0, 0, meeting);
+    this.meetings.splice(0, 0, meeting);
   }
 
   private showSchedule(){
