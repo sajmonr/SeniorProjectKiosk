@@ -38,9 +38,13 @@ export class InsideComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    console.log('init');
     if(!this.room){
       this.message.error('You have not selected any room. You will not see any results. :(');
     }
+    if(this.roomService.isConnected)
+      this.onConnected();
+
     this.roomService.connected.subscribe(this.onConnected.bind(this));
   }
 

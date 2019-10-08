@@ -13,6 +13,8 @@ export class RoomService{
   @Output()meetingsUpdated = new EventEmitter<Meeting[]>();
   private hubConnection: signalR.HubConnection;
 
+  isConnected = false;
+
   constructor(private settings: SettingsService){
     this.settings.initialized.subscribe(result => {
       if(result){
@@ -32,6 +34,7 @@ export class RoomService{
     this.hubConnection.onclose(error => {
       console.log('The connection was lost: ' + error);
       console.log('Reconnecting in 30 seconds.');
+      this.isConnected = false;
       this.disconnected.emit();
       this.reconnectIn(30);
     });
@@ -42,6 +45,7 @@ export class RoomService{
       .start()
       .then(() => {
         console.log('Successfully connected to server.');
+        this.isConnected = true;
         this.connected.emit(true);
       })
       .catch(err => {
